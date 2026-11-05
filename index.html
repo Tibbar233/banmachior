@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>2027 斑馬流🦓音樂組練唱出席</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;800&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: one column — who-am-I bar, month tabs, a staff-ruled calendar, then the per-date roster */
+:root{
+  --bg:#F4F6FA; --surface:#FFFFFF; --ink:#1B2233; --muted:#5E6779; --line:#DCE1EA;
+  --accent:#2B4FC4; --accent-soft:#E3E9FB; --mine:#2B4FC4; --mine-ink:#FFFFFF;
+  --heat:#1E8A6A; --warn:#B4472B; --dim:#A9B0BE; --hol:#C2402A; --hol-soft:#FBE9E5;
+  --display:"Noto Serif TC", "Songti TC", serif;
+  --body:"Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12161F; --surface:#1A202C; --ink:#E6EAF2; --muted:#9AA3B5; --line:#2C3445;
+  --accent:#8EA8FF; --accent-soft:#232E4C; --mine:#6F8CF0; --mine-ink:#0D1220;
+  --heat:#4CC59C; --warn:#F08B6E; --dim:#4C5466; --hol:#F28C77; --hol-soft:#3A2422; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161F; --surface:#1A202C; --ink:#E6EAF2; --muted:#9AA3B5; --line:#2C3445;
+  --accent:#8EA8FF; --accent-soft:#232E4C; --mine:#6F8CF0; --mine-ink:#0D1220;
+  --heat:#4CC59C; --warn:#F08B6E; --dim:#4C5466; --hol:#F28C77; --hol-soft:#3A2422; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:880px;margin:0 auto;padding-block:28px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:22px}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,5vw,36px);margin:0;letter-spacing:.02em;text-wrap:balance}
+header p{margin:6px 0 0;color:var(--muted)}
+.staff{height:14px;margin-top:14px;background:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px 3.25px);max-width:220px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.who{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.who .lab{font-size:13px;letter-spacing:.06em;color:var(--muted);margin-right:4px}
+.pick{border-radius:999px;padding:7px 16px}
+.pick[aria-pressed=true]{background:var(--mine);border-color:var(--mine);color:var(--mine-ink);font-weight:700}
+button{font:inherit;cursor:pointer;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 12px}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,.day:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.status{font-size:13px;color:var(--muted);margin-top:10px;min-height:1.4em}
+.status.err{color:var(--warn)}
+.note{font-size:13px;color:var(--muted);margin:0}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.tab{flex:0 0 auto;padding:6px 12px;border-radius:999px;font-variant-numeric:tabular-nums;display:flex;gap:6px;align-items:center}
+.tab[aria-selected=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab .dot{width:7px;height:7px;border-radius:50%;background:var(--mine)}
+.tab[aria-selected=true] .dot{background:var(--bg)}
+.monthhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px}
+.monthhead h2{font-family:var(--display);font-size:24px;margin:0}
+.monthhead .acts{display:flex;gap:6px}
+.due{margin:4px 0 0;font-size:14px;color:var(--hol);font-variant-numeric:tabular-nums}
+.due b{font-size:15px}
+.due .late{margin-left:8px;font-size:12px;padding:1px 8px;border-radius:999px;background:var(--hol-soft)}
+.monthhead .acts button{padding:5px 10px;font-size:13px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-top:12px}
+.dow{font-size:12px;text-align:center;color:var(--muted);padding:4px 0;letter-spacing:.05em}
+.dow.rh{color:var(--accent);font-weight:700}
+.cell{min-height:64px;border-radius:8px;padding:6px;font-variant-numeric:tabular-nums;color:var(--dim);font-size:13px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.cell.hol{background:var(--hol-soft);color:var(--hol)}
+.cell.hol .n{font-weight:700}
+.cell .hn{font-size:11px;line-height:1.25;word-break:break-all}
+.cell.rhol{border:1px dashed var(--hol)}
+.day{min-height:76px;border-radius:8px;padding:6px 7px;border:1px solid var(--line);
+  display:flex;flex-direction:column;justify-content:space-between;text-align:left;color:var(--ink);position:relative;
+  --h:0;background:color-mix(in srgb,var(--heat) calc(var(--h)*28%),var(--bg))}
+.day .n{font-weight:700;font-size:16px}
+.day .c{font-size:12px;color:var(--muted)}
+.day .c b{color:var(--ink);font-size:15px}
+.day.mine{border:2px solid var(--mine)}
+.day .chk{position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--dim);display:grid;place-items:center;font-size:12px;line-height:1}
+.day.mine .chk{background:var(--mine);border-color:var(--mine);color:var(--mine-ink)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);margin-top:10px}
+.legend span{display:flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:4px;border:1px solid var(--line)}
+.list{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:5.5em 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .d{font-variant-numeric:tabular-nums}
+.row .d strong{display:block;font-size:17px}
+.row .d small{color:var(--muted)}
+.row .body{min-width:0;display:flex;flex-direction:column;gap:6px}
+.row.off .d strong,.row.off .body{color:var(--hol)}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--heat)}
+.names{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:13px;padding:1px 9px;border-radius:999px;background:var(--accent-soft);color:var(--ink);white-space:nowrap}
+.chip.me{background:var(--mine);color:var(--mine-ink)}
+.chip.no{background:transparent;border:1px dashed var(--line);color:var(--muted)}
+.meta{font-size:13px;color:var(--muted)}
+.meta b{color:var(--ink)}
+.best{color:var(--heat);font-weight:700;font-size:12px;margin-left:6px}
+h3{font-family:var(--display);font-size:18px;margin:0 0 6px}
+.roster{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+@media (max-width:520px){
+  .day{min-height:58px;padding:4px 5px}
+  .day .n{font-size:14px}
+  .day .c{font-size:11px}
+  .day .chk{width:15px;height:15px;font-size:10px;top:4px;right:4px}
+  .cell{min-height:58px;padding:4px}
+  .cell .hn{font-size:10px}
+}
+@media (prefers-reduced-motion:no-preference){.day{transition:background .2s,border-color .2s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>2027 斑馬流🦓音樂組練唱出席調查</h1>
+    <p>練唱固定在每週四、週五（二月停練）。先點選你的名字，再點月曆上的日期勾選「可以到」，沒勾的就是不能到。遇到國定假日不練唱。</p>
+    <div class="staff" aria-hidden="true"></div>
+  </header>
+
+  <section class="panel" aria-label="我是誰">
+    <div class="who" id="who"><span class="lab">我是</span></div>
+    <div class="status" id="status">正在讀取大家的回覆…</div>
+  </section>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="月份"></nav>
+
+  <section class="panel">
+    <div class="monthhead">
+      <div><h2 id="mTitle"></h2><p class="due" id="due"></p></div>
+      <div class="acts">
+        <button id="allBtn">本月全部可以</button>
+        <button id="noneBtn">本月清除</button>
+      </div>
+    </div>
+    <div class="cal" id="cal"></div>
+    <div class="legend">
+      <span><span class="sw" style="border:2px solid var(--mine)"></span>我可以到</span>
+      <span><span class="sw" style="background:color-mix(in srgb,var(--heat) 28%,var(--bg))"></span>顏色越深，可到人數越多</span>
+      <span><span class="sw" style="background:var(--hol-soft);border-color:var(--hol)"></span>國定假日・不練唱</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3 id="lTitle">本月各練唱日</h3>
+    <div class="list" id="list"></div>
+  </section>
+
+  <section class="panel">
+    <h3 id="rTitle">填寫狀況</h3>
+    <p class="note" id="rosterNote"></p>
+    <div class="roster" id="roster"></div>
+  </section>
+</div>
+
+<script type="module">
+// ===== 把 Firebase 的設定貼在這裡（取代下面整段大括號） =====
+const firebaseConfig = {
+  apiKey: "AIzaSyCBt0v-lukhYi72K-S8U00v6_KPDwwftGM",
+  authDomain: "banma-chior.firebaseapp.com",
+  projectId: "banma-chior",
+  storageBucket: "banma-chior.firebasestorage.app",
+  messagingSenderId: "1017085022804",
+  appId: "1:1017085022804:web:53f7ce06f029c6f74d53c1"
+};
+// ===========================================================
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const YEAR = 2027;
+const WD = ["日","一","二","三","四","五","六"];
+const PEOPLE = [
+  {id:"m1",name:"朱大哥"},{id:"m2",name:"鄭美"},{id:"m3",name:"Lulu"},{id:"m4",name:"阿黃"},{id:"m5",name:"貝貝"}
+];
+const SKIP_MONTHS = [1]; // 二月停練
+// 2027（民國116年）放假日，依行政院人事行政總處辦公日曆表
+const HOLIDAYS = {
+  "2027-01-01":"開國紀念日",
+  "2027-02-04":"小年夜","2027-02-05":"除夕","2027-02-06":"春節","2027-02-07":"春節","2027-02-08":"春節",
+  "2027-02-09":"春節補假","2027-02-10":"春節補假",
+  "2027-02-28":"和平紀念日","2027-03-01":"和平紀念日補假",
+  "2027-04-04":"兒童節","2027-04-05":"清明節","2027-04-06":"兒童節補假",
+  "2027-04-30":"勞動節補假","2027-05-01":"勞動節",
+  "2027-06-09":"端午節","2027-09-15":"中秋節","2027-09-28":"教師節",
+  "2027-10-10":"國慶日","2027-10-11":"國慶日補假","2027-10-25":"臺灣光復節",
+  "2027-12-24":"行憲紀念日補假","2027-12-25":"行憲紀念日","2027-12-31":"元旦補假"
+};
+const pad = n => String(n).padStart(2,"0");
+const key = (m,d) => `${YEAR}-${pad(m+1)}-${pad(d)}`;
+const MONTHS = Array.from({length:12},(_,m)=>m).filter(m=>!SKIP_MONTHS.includes(m));
+
+// Thursday / Friday dates per month; holiday ones flagged
+const DATES = {};
+MONTHS.forEach(m=>{
+  const out=[]; const days=new Date(YEAR,m+1,0).getDate();
+  for(let d=1;d<=days;d++){const w=new Date(YEAR,m,d).getDay(); if(w===4||w===5){const k=key(m,d); out.push({k,d,w,hol:HOLIDAYS[k]||null});}}
+  DATES[m]=out;
+});
+
+let dates = {};            // person id -> [dateKeys]
+PEOPLE.forEach(p=>dates[p.id]=[]);
+let myId = null, month = 0;
+let db = null, canWrite = true, pending = null, saving = false, dirty = false;
+
+try { const s=localStorage.getItem("choir2027.me"); if(PEOPLE.some(p=>p.id===s)) myId=s; } catch(e) {}
+
+const $ = id => document.getElementById(id);
+const nameOf = id => (PEOPLE.find(p=>p.id===id)||{}).name;
+function setStatus(t, err){ const s=$("status"); s.textContent=t; s.classList.toggle("err",!!err); }
+const whoOn = k => PEOPLE.filter(p=>dates[p.id].includes(k));
+const inMonth = (id,m) => dates[id].some(k=>k.startsWith(`${YEAR}-${pad(m+1)}`));
+
+function render(){
+  // keep cursor position if someone is typing in a note while data refreshes
+  const ae=document.activeElement, aeId=ae&&ae.id, s0=ae&&ae.selectionStart, s1=ae&&ae.selectionEnd;
+  draw();
+  if(aeId){ const el=document.getElementById(aeId); if(el&&el!==ae){ el.focus(); if(s0!=null&&el.setSelectionRange) el.setSelectionRange(s0,s1); } }
+}
+
+function draw(){
+  $("who").innerHTML = '<span class="lab">我是</span>' + PEOPLE.map(p=>
+    `<button class="pick" data-p="${p.id}" aria-pressed="${p.id===myId}">${p.name}</button>`).join("");
+
+  $("tabs").innerHTML = MONTHS.map(m=>{
+    const has = myId && inMonth(myId,m);
+    return `<button class="tab" role="tab" aria-selected="${m===month}" data-m="${m}">${m+1}月${has?'<span class="dot" title="我已勾選"></span>':''}</button>`;
+  }).join("");
+
+  const total = PEOPLE.length;
+  $("mTitle").textContent = `${YEAR} 年 ${month+1} 月`;
+  // 截止日：前兩個月的月底（例：1月 → 前一年 11/30）
+  const dl=new Date(YEAR,month-1,0);
+  const past=new Date()>new Date(dl.getFullYear(),dl.getMonth(),dl.getDate()+1);
+  $("due").innerHTML=`請於 <b>${dl.getFullYear()}/${dl.getMonth()+1}/${dl.getDate()}</b> 前填寫完畢${past?'<span class="late">已過截止日</span>':''}`;
+  $("allBtn").disabled = $("noneBtn").disabled = !myId||!canWrite||!db;
+
+  // calendar
+  const first=new Date(YEAR,month,1).getDay(), days=new Date(YEAR,month+1,0).getDate();
+  let h = WD.map((w,i)=>`<div class="dow${i===4||i===5?" rh":""}">${w}</div>`).join("");
+  for(let i=0;i<first;i++) h+='<div></div>';
+  for(let d=1;d<=days;d++){
+    const w=new Date(YEAR,month,d).getDay(), k=key(month,d), hol=HOLIDAYS[k];
+    if((w===4||w===5) && !hol){
+      const n=whoOn(k).length, isMine=myId&&dates[myId].includes(k);
+      h+=`<button class="day${isMine?" mine":""}" data-k="${k}" style="--h:${(n/total).toFixed(2)}"
+        aria-pressed="${!!isMine}" aria-label="${month+1}月${d}日 週${WD[w]}，${n} 人可到${isMine?"，包含我":""}">
+        <span class="n">${d}</span><span class="chk">${isMine?"✓":""}</span>
+        <span class="c"><b>${n}</b> 人</span></button>`;
+    } else if(hol){
+      h+=`<div class="cell hol${w===4||w===5?" rhol":""}"><span class="n">${d}</span><span class="hn">${hol}</span></div>`;
+    } else h+=`<div class="cell">${d}</div>`;
+  }
+  $("cal").innerHTML=h;
+
+  // list
+  const list=DATES[month];
+  const counts=list.filter(x=>!x.hol).map(x=>whoOn(x.k).length);
+  const max=Math.max(0,...counts);
+  $("lTitle").textContent = `${month+1} 月各練唱日・誰可以到`;
+  $("list").innerHTML = list.map(x=>{
+    if(x.hol) return `<div class="row off"><div class="d"><strong>${month+1}/${x.d}</strong><small>週${WD[x.w]}</small></div>
+      <div class="body"><div class="meta" style="color:inherit">${x.hol}，放假不練唱</div></div></div>`;
+    const ppl=whoOn(x.k);
+    const no=PEOPLE.filter(p=>!ppl.includes(p));
+    return `<div class="row">
+      <div class="d"><strong>${month+1}/${x.d}</strong><small>週${WD[x.w]}</small></div>
+      <div class="body">
+        <div class="meta"><b>${ppl.length}</b> / ${total} 人可到${ppl.length&&ppl.length===max?'<span class="best">本月最多人</span>':''}</div>
+        <div class="bar"><i style="width:${ppl.length/total*100}%"></i></div>
+        <div class="names">${ppl.map(p=>`<span class="chip${p.id===myId?" me":""}">${p.name}</span>`).join("")}${no.map(p=>`<span class="chip no">${p.name}</span>`).join("")}</div>
+      </div></div>`;
+  }).join("");
+
+  // roster
+  const done = PEOPLE.filter(p=>inMonth(p.id,month));
+  $("rTitle").textContent = `${month+1} 月填寫狀況`;
+  $("rosterNote").textContent = `${done.length} / ${total} 人已勾選本月日期。實心是已勾選，虛線是還沒勾。`;
+  $("roster").innerHTML = PEOPLE.map(p=>`<span class="chip${inMonth(p.id,month)?(p.id===myId?" me":""):" no"}">${p.name}</span>`).join("");
+}
+
+// ---- saving (one write at a time, coalesced) ----
+function queueSave(){ dirty=true; setStatus("儲存中…"); clearTimeout(pending); pending=setTimeout(flush,600); }
+async function flush(){
+  if(saving||!dirty||!db||!myId) return;
+  const id=myId; saving=true; dirty=false;
+  try{
+    await setDoc(doc(db,"attendance",id),{name:nameOf(id),dates:[...dates[id]].sort(),updatedAt:new Date().toISOString()});
+    setStatus(`已儲存。${nameOf(id)} 目前共勾了 ${dates[id].length} 天。`);
+  }catch(e){
+    if(e&&e.code==="permission-denied"){ setStatus("資料庫拒絕儲存，請檢查 Firestore 的安全規則。",true); }
+    else { dirty=true; setStatus("沒有存到，網路可能不穩，稍後會再試一次。",true); setTimeout(flush,2500); }
+  }finally{ saving=false; if(dirty) flush(); }
+}
+
+function toggle(k){
+  if(!myId){ setStatus("請先在上方點選你的名字。",true); return; }
+  if(!db||!canWrite) return;
+  const s=new Set(dates[myId]); s.has(k)?s.delete(k):s.add(k); dates[myId]=[...s];
+  render(); queueSave();
+}
+
+// ---- events ----
+$("who").addEventListener("click",e=>{const b=e.target.closest("[data-p]"); if(!b)return;
+  if(dirty||saving){ setStatus("等上一筆存好再切換名字。",true); return; }
+  myId=b.dataset.p; try{localStorage.setItem("choir2027.me",myId);}catch(_){}
+  setStatus(canWrite?`嗨 ${nameOf(myId)}，點月曆上的週四、週五勾選可以到的日期。`:"你目前只能查看，無法勾選。"); render();});
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("[data-m]"); if(!b)return; month=+b.dataset.m; render();});
+$("cal").addEventListener("click",e=>{const b=e.target.closest("[data-k]"); if(b) toggle(b.dataset.k);});
+function setMonth(on){
+  if(!myId||!canWrite||!db) return;
+  const ks=DATES[month].filter(x=>!x.hol).map(x=>x.k); const s=new Set(dates[myId]);
+  ks.forEach(k=>on?s.add(k):s.delete(k)); dates[myId]=[...s]; render(); queueSave();
+}
+$("allBtn").addEventListener("click",()=>setMonth(true));
+$("noneBtn").addEventListener("click",()=>setMonth(false));
+
+render();
+
+// ---- connect ----
+(()=>{
+  if(firebaseConfig.projectId==="請貼上"){ setStatus("尚未設定 Firebase：請把設定貼到 index.html 最上方的 firebaseConfig。",true); return; }
+  try{ db = getFirestore(initializeApp(firebaseConfig)); }
+  catch(e){ setStatus("Firebase 設定有誤，請檢查貼上的內容。",true); return; }
+  let timer=setTimeout(()=>setStatus("暫時讀不到大家的回覆，可能是網路問題，稍候會自動更新。",true),10000);
+  onSnapshot(collection(db,"attendance"), {includeMetadataChanges:true}, snap=>{
+    const next={}; PEOPLE.forEach(p=>next[p.id]=[]);
+    snap.docs.forEach(d=>{ if(next[d.id]) { const v=d.data(); next[d.id]=Array.isArray(v.dates)?v.dates.filter(k=>!HOLIDAYS[k]):[]; } });
+    if(myId && (dirty||saving)) next[myId]=dates[myId];   // keep my unsaved edits
+    dates=next;
+    if(!snap.metadata.fromCache){ clearTimeout(timer);
+      if(!dirty&&!saving) setStatus(!canWrite?"你目前只能查看，無法勾選。":myId?`嗨 ${nameOf(myId)}，點月曆上的週四、週五勾選可以到的日期。`:"請先在上方點選你的名字。");
+    }
+    render();
+  },err=>{ clearTimeout(timer);
+    setStatus(err&&err.code==="permission-denied"?"資料庫拒絕讀取，請檢查 Firestore 的安全規則。":"名單連線中斷，請重新整理頁面。",true); });
+  render();
+})();
+</script>
+</body>
+</html>
