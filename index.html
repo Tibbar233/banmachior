@@ -224,7 +224,7 @@ function draw(){
   const total = PEOPLE.length;
   $("mTitle").textContent = `${YEAR} 年 ${month+1} 月`;
   // 截止日：前兩個月的月底（例：1月 → 前一年 11/30）
-  const dl=new Date(YEAR,month-1,0);
+  const DUE={0:[2026,12,20],2:[2027,2,20],3:[2027,2,20],4:[2027,4,20],5:[2027,4,20],6:[2027,6,20],7:[2027,6,20],8:[2027,8,20],9:[2027,8,20],10:[2027,10,20],11:[2027,10,20]}[month]; const dl=new Date(DUE[0],DUE[1]-1,DUE[2]);
   const past=new Date()>new Date(dl.getFullYear(),dl.getMonth(),dl.getDate()+1);
   $("due").innerHTML=`請於 <b>${dl.getFullYear()}/${dl.getMonth()+1}/${dl.getDate()}</b> 前填寫完畢${past?'<span class="late">已過截止日</span>':''}`;
   $("allBtn").disabled = $("noneBtn").disabled = !myId||!canWrite||!db;
